@@ -1,0 +1,109 @@
+buildscript {
+    ext.kotlin_version = '1.1.51'
+    ext.vertx_version = '3.4.2'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "org.jetbrains.kotlin.jvm" version "1.1.51"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile "io.vertx:vertx-core:$vertx_version"
+    compile "io.vertx:vertx-web:$vertx_version"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
+    compile group: 'com.lmax', name: 'disruptor', version: '3.3.4'
+    compile "org.jetbrains.kotlin:kotlin-reflect"
+
+    testCompile "junit:junit:4.12"
+    testCompile "org.jetbrains.kotlin:kotlin-test"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+    testCompile 'io.vertx:vertx-config:3.4.2'
+    testCompile "io.vertx:vertx-unit:$vertx_version"
+    testCompile 'io.rest-assured:rest-assured:3.0.3'
+}
+
+sourceCompatibility = '1.8'
+version = '1.0-SNAPSHOT'
+def watchForChange = 'src/**/*'
+def confFile = 'src/main/conf/app-conf.json'
+def doOnChange
+
+if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    doOnChange = '.\\gradlew classes'
+} else {
+    doOnChange = './gradlew classes'
+}
+
+mainClassName = 'com.netcompany.vertx.examples.web.VertxLauncher'
+def mainVerticleName = 'com.netcompany.vertx.examples.web.MainVerticle'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/java'
+    test.java.srcDirs += 'src/test/java'
+
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    test.kotlin.srcDirs += 'src/test/kotlin'
+
+    main.resources.srcDirs += 'src/main/resources'
+    test.resources.srcDirs += 'src/test/resources'
+}
+
+shadowJar {
+    classifier = 'fat'
+
+    applicationDefaultJvmArgs = [
+            "-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory"
+    ]
+
+    manifest {
+        attributes "Main-Verticle": mainVerticleName
+    }
+
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+run {
+    args = ['run', mainVerticleName,
+            "--redeploy=$watchForChange",
+            "--launcher-class=$mainClassName",
+            "--on-redeploy=$doOnChange",
+            "--java-opts=\"-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory\"",
+            "-conf $confFile"]
+}
+
+test {
+    systemProperty "vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
+}
