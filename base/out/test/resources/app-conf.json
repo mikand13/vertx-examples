@@ -1,8 +1,0 @@
-{
-  "environment" : "TEST",
-  "ports" : {
-    "java" : 8080,
-    "js" : 8081,
-    "ruby" : 8082
-  }
-}
