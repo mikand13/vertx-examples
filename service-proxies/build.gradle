@@ -1,0 +1,202 @@
+buildscript {
+    ext.kotlin_version = '1.1.51'
+    ext.vertx_version = '3.5.0.Beta1'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "org.jetbrains.kotlin.jvm" version "1.1.51"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile "io.vertx:vertx-core:$vertx_version"
+    compile "io.vertx:vertx-codegen:$vertx_version"
+    compile "io.vertx:vertx-lang-ruby:$vertx_version"
+    compile "io.vertx:vertx-lang-js:$vertx_version"
+    compile "io.vertx:vertx-service-proxy:$vertx_version:processor"
+    compile "io.vertx:vertx-sockjs-service-proxy:$vertx_version"
+    compile "io.vertx:vertx-tcp-eventbus-bridge:$vertx_version"
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
+    compile group: 'com.lmax', name: 'disruptor', version: '3.3.4'
+    compile "org.jetbrains.kotlin:kotlin-reflect"
+
+    testCompile "junit:junit:4.12"
+    testCompile "org.jetbrains.kotlin:kotlin-test"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+    testCompile 'io.vertx:vertx-config:3.4.2'
+    testCompile "io.vertx:vertx-unit:$vertx_version"
+    testCompile 'io.rest-assured:rest-assured:3.0.3'
+}
+
+sourceCompatibility = '1.8'
+version = '1.0-SNAPSHOT'
+def watchForChange = 'src/**/*'
+def confFile = 'src/main/conf/app-conf.json'
+def doOnChange
+
+if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    doOnChange = '.\\gradlew classes'
+} else {
+    doOnChange = './gradlew classes'
+}
+
+mainClassName = 'com.netcompany.vertx.examples.serviceproxies.VertxLauncher'
+def mainVerticleName = 'com.netcompany.vertx.examples.serviceproxies.MainVerticle'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+def ruby_ouput = project.file('src/main/resources')
+
+task annotationProcessing(type: JavaCompile, group: 'build') { // codegen
+    source = sourceSets.main.java
+    classpath = configurations.compile + configurations.compileOnly
+    destinationDir = project.file('src/main/generated')
+    options.compilerArgs = [
+            "-proc:only",
+            "-processor", "io.vertx.codegen.CodeGenProcessor"
+    ]
+}
+
+task copyResources(type: Copy) {
+    from 'src/main/generated'
+    into 'src/main/resources/generated'
+
+    includeEmptyDirs = false
+
+    include '**/*_service.js'
+    include '**/*_service.rb'
+
+    dependsOn annotationProcessing
+}
+
+task copyEventBusServices(type: Copy) {
+    from 'src/main/generated'
+    into 'assembly/eventbus'
+
+    includeEmptyDirs = false
+
+    include '**/*_service-proxy.js'
+
+    dependsOn copyResources
+}
+
+task deleteServices(type: Delete) {
+    //noinspection GroovyAssignabilityCheck
+    delete fileTree(dir: 'src/main/generated', includes: ['**/*.js', '**/*.rb'])
+
+    followSymlinks = true
+
+    doLast {
+        def emptyDirs = []
+
+        project.fileTree(dir: 'src/main/generated').visit {
+            def File f = it.file
+
+            if (f.isDirectory()) {
+                def children = project.fileTree(f).filter { it.isFile() }.files
+                if (children.size() == 0) {
+                    emptyDirs << f
+                }
+            }
+        }
+
+        println "Empty Dirs: $emptyDirs"
+
+        emptyDirs.reverseEach { it.delete() }
+    }
+
+    dependsOn copyEventBusServices
+}
+
+task zip(type: Zip) {
+    from 'assembly/eventbus'
+    include '*'
+    include '*/*'
+    archiveName 'netcompany-eventbus.zip'
+    destinationDir(file('assembly/out'))
+
+    dependsOn deleteServices
+}
+
+compileJava {
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
+
+    dependsOn zip
+}
+
+clean {
+    delete += 'src/main/generated'
+    delete += 'src/main/resources/generated'
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/generated'
+    test.java.srcDirs += 'src/test/java'
+    test.java.srcDirs += 'src/main/generated'
+
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    test.kotlin.srcDirs += 'src/test/kotlin'
+
+    main.resources.srcDirs += 'src/main/resources'
+    test.resources.srcDirs += 'src/test/resources'
+}
+
+shadowJar {
+    classifier = 'fat'
+
+    applicationDefaultJvmArgs = [
+            "-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory"
+    ]
+
+    manifest {
+        attributes "Main-Verticle": mainVerticleName
+    }
+
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+run {
+    args = ['run', mainVerticleName,
+            "--redeploy=$watchForChange",
+            "--launcher-class=$mainClassName",
+            "--on-redeploy=$doOnChange",
+            "--java-opts=\"-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory\"",
+            "-conf $confFile"]
+}
+
+test {
+    systemProperty "vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
+}

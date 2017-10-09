@@ -1,7 +1,8 @@
-package com.netcompany.vertx.examples.web
+package com.netcompany.vertx.examples.serviceproxies
 
-import com.netcompany.vertx.examples.web.utils.ConfigSupport
-import com.netcompany.vertx.examples.web.utils.WhenSupport
+import com.netcompany.vertx.examples.serviceproxies.MainVerticle
+import com.netcompany.vertx.examples.serviceproxies.utils.ConfigSupport
+import com.netcompany.vertx.examples.serviceproxies.utils.WhenSupport
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.vertx.core.DeploymentOptions
@@ -46,8 +47,10 @@ class MainVerticleTest : WhenSupport, ConfigSupport {
     }
 
     @After
-    fun tearDown() {
-        vertx?.close()
+    fun tearDown(context: TestContext) {
+        val async = context.async()
+
+        vertx?.close({ async.complete() })
     }
 
     @Test

@@ -18,8 +18,8 @@ import org.junit.runner.RunWith
 
 @RunWith(VertxUnitRunner::class)
 class MainVerticleTest : WhenSupport, ConfigSupport {
-    var logger: Logger = LoggerFactory.getLogger(MainVerticleTest::class.simpleName)
-    var vertx: Vertx? = null
+    private var logger: Logger = LoggerFactory.getLogger(MainVerticleTest::class.simpleName)
+    private var vertx: Vertx? = null
 
     companion object {
         @BeforeClass

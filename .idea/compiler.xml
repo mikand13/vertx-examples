@@ -6,6 +6,9 @@
       <module name="base_test" target="1.8" />
       <module name="eventbus_main" target="1.8" />
       <module name="eventbus_test" target="1.8" />
+      <module name="service-proxies_generated" target="1.8" />
+      <module name="service-proxies_main" target="1.8" />
+      <module name="service-proxies_test" target="1.8" />
       <module name="web_main" target="1.8" />
       <module name="web_test" target="1.8" />
     </bytecodeTargetLevel>

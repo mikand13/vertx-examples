@@ -1,0 +1,13 @@
+= Cheatsheets
+
+[[HeartBeatPOJO]]
+== HeartBeatPOJO
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[ping]]`ping`|`Boolean`|-
+|===
+

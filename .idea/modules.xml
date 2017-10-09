@@ -9,6 +9,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eventbus/eventbus_main.iml" filepath="$PROJECT_DIR$/.idea/modules/eventbus/eventbus_main.iml" group="eventbus" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eventbus/eventbus_test.iml" filepath="$PROJECT_DIR$/.idea/modules/eventbus/eventbus_test.iml" group="eventbus" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples.iml" filepath="$PROJECT_DIR$/.idea/modules/examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies.iml" group="service-proxies" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_main.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_main.iml" group="service-proxies" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_test.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_test.iml" group="service-proxies" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web.iml" group="web" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web_main.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web_main.iml" group="web" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web_test.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web_test.iml" group="web" />

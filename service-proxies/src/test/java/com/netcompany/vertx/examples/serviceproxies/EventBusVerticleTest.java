@@ -1,20 +1,21 @@
-package com.netcompany.vertx.examples.eventbus;
+package com.netcompany.vertx.examples.serviceproxies;
 
-import com.netcompany.vertx.examples.eventbus.utils.ConfigSupportJava;
+import com.netcompany.vertx.examples.serviceproxies.services.HeartBeatService;
+import com.netcompany.vertx.examples.serviceproxies.utils.ConfigSupportJava;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.serviceproxy.ProxyHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(VertxUnitRunner.class)
@@ -41,26 +42,14 @@ public class EventBusVerticleTest implements ConfigSupportJava {
         vertx.close();
     }
 
-    @Test(timeout = 20000L)
-    public void testEventbusVerticlePublish(TestContext context) throws Exception {
+    @Test
+    public void testHeartBeat(TestContext context) {
         Async async = context.async();
 
-        vertx.eventBus().<JsonObject>consumer(EventBusVerticle.EXAMPLE_PUBLISH_ADDRESS, message -> {
-            assertNotNull(message.body().getString("testKey"));
-            assertTrue(message.body().getString("testKey").equals("testValue"));
+        final HeartBeatService proxy = ProxyHelper.createProxy(HeartBeatService.class, vertx, "com.netcompany.heart");
 
-            async.complete();
-        });
-    }
-
-    @Test(timeout = 5000L)
-    public void testEventbusVerticleSend(TestContext context) throws Exception {
-        Async async = context.async();
-
-        vertx.eventBus().<JsonObject>consumer(EventBusVerticle.EXAMPLE_SEND_ADDRESS, message -> {
-            assertNotNull(message.body().getString("testKey"));
-            assertTrue(message.body().getString("testKey").equals("testValue"));
-
+        proxy.ping(pingRes -> {
+            assertTrue(pingRes.result().getPing());
             async.complete();
         });
     }
