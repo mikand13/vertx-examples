@@ -1,7 +1,7 @@
-package com.netcompany.vertx.examples.serviceproxies
+package com.netcompany.vertx.examples.cluster
 
-import com.netcompany.vertx.examples.serviceproxies.utils.ConfigSupport
-import com.netcompany.vertx.examples.serviceproxies.utils.WhenSupport
+import com.netcompany.vertx.examples.cluster.utils.ConfigSupport
+import com.netcompany.vertx.examples.cluster.utils.WhenSupport
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.vertx.core.DeploymentOptions

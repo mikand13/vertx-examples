@@ -5,13 +5,18 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/base.iml" filepath="$PROJECT_DIR$/.idea/modules/base.iml" group="base" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/base/base_main.iml" filepath="$PROJECT_DIR$/.idea/modules/base/base_main.iml" group="base" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/base/base_test.iml" filepath="$PROJECT_DIR$/.idea/modules/base/base_test.iml" group="base" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cluster/cluster.iml" filepath="$PROJECT_DIR$/.idea/modules/cluster/cluster.iml" group="cluster" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cluster/cluster_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cluster/cluster_main.iml" group="cluster" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cluster/cluster_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cluster/cluster_test.iml" group="cluster" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eventbus/eventbus.iml" filepath="$PROJECT_DIR$/.idea/modules/eventbus/eventbus.iml" group="eventbus" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eventbus/eventbus_main.iml" filepath="$PROJECT_DIR$/.idea/modules/eventbus/eventbus_main.iml" group="eventbus" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eventbus/eventbus_test.iml" filepath="$PROJECT_DIR$/.idea/modules/eventbus/eventbus_test.iml" group="eventbus" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples.iml" filepath="$PROJECT_DIR$/.idea/modules/examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cluster/main.iml" filepath="$PROJECT_DIR$/.idea/modules/cluster/main.iml" group="cluster" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies.iml" group="service-proxies" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_main.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_main.iml" group="service-proxies" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_test.iml" filepath="$PROJECT_DIR$/.idea/modules/service-proxies/service-proxies_test.iml" group="service-proxies" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cluster/test.iml" filepath="$PROJECT_DIR$/.idea/modules/cluster/test.iml" group="cluster" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web.iml" group="web" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web_main.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web_main.iml" group="web" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/web/web_test.iml" filepath="$PROJECT_DIR$/.idea/modules/web/web_test.iml" group="web" />

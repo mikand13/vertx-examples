@@ -1,0 +1,17 @@
+version: '3'
+
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: 10.2.0.0/16
+
+services:
+  service:
+    image: com.netcompany.vertx/cluster-example:latest
+    networks:
+      backend:
+  service_2:
+    image: com.netcompany.vertx/cluster-example:latest
+    networks:
+      backend:
