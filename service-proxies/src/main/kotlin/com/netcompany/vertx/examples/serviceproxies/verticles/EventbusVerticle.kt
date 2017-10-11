@@ -19,9 +19,6 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandler
 import io.vertx.kotlin.ext.web.handler.sockjs.SockJSHandlerOptions
 import java.util.ArrayList
 
-
-
-
 class EventbusVerticle : AbstractVerticle() {
     private val logger: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 

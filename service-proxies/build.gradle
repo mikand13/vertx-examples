@@ -1,3 +1,5 @@
+import com.wiredforcode.gradle.spawn.*
+
 buildscript {
     ext.kotlin_version = '1.1.51'
     ext.vertx_version = '3.5.0.Beta1'
@@ -5,10 +7,12 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'http://dl.bintray.com/vermeulen-mp/gradle-plugins' }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.wiredforcode:gradle-spawn-plugin:0.6.0'
     }
 }
 
@@ -17,6 +21,8 @@ plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     id "org.jetbrains.kotlin.jvm" version "1.1.51"
+    id "com.moowork.node" version "1.2.0"
+    id 'com.wiredforcode.spawn' version "0.6.0"
 }
 
 repositories {
@@ -153,6 +159,8 @@ compileJava {
 clean {
     delete += 'src/main/generated'
     delete += 'src/main/resources/generated'
+    delete += 'build/libs'
+    delete += '.pid.lock'
 }
 
 sourceSets {
@@ -195,6 +203,38 @@ run {
 
 test {
     systemProperty "vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.Log4j2LogDelegateFactory"
+}
+
+task startServer(type: SpawnProcessTask, dependsOn: 'shadowJar') {
+    command "java -jar ${projectDir}/build/libs/service-proxies-1.0-SNAPSHOT-fat.jar"
+    ready 'All verticles running, deployment complete!'
+}
+
+task stopServer(type: KillProcessTask)
+
+task testEventBus(type: NodeTask, dependsOn: 'startServer') {
+    script = file('src/test/js/eventbus/eventbus_test.js')
+
+    execOverrides {
+        it.workingDir = 'src/test/js/eventbus'
+    }
+
+    dependsOn npmInstall
+}
+
+test.finalizedBy(testEventBus)
+testEventBus.finalizedBy(stopServer)
+
+node {
+    version = '6.9.1'
+    npmVersion = '3.10.8'
+    yarnVersion = '1.2.0'
+    distBaseUrl = 'https://nodejs.org/dist'
+    download = true
+    workDir = file("${project.buildDir}/nodejs")
+    npmWorkDir = file("${project.buildDir}/npm")
+    yarnWorkDir = file("${project.buildDir}/yarn")
+    nodeModulesDir = file("${project.projectDir}")
 }
 
 task wrapper(type: Wrapper) {

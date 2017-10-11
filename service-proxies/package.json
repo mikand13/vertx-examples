@@ -1,0 +1,9 @@
+{
+  "name": "vertx_testing",
+  "author": "Anders Mikkelsen",
+  "dependencies": {
+    "sockjs-client": "^1.1.4",
+    "vertx3-eventbus-client": "^3.4.2",
+    "vertx3-full": "^3.4.2"
+  }
+}
