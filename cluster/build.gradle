@@ -111,7 +111,8 @@ run {
             "--launcher-class=$mainClassName",
             "--on-redeploy=$doOnChange",
             "--java-opts=\"-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory\"",
-            "-conf $confFile"]
+            "-conf $confFile",
+            "-cluster"]
 }
 
 test {

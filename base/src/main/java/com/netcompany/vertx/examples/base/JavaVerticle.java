@@ -84,7 +84,7 @@ public class JavaVerticle extends AbstractVerticle {
     }
 
     @SuppressWarnings("unchecked")
-    private <U> void newUUIDFromOldUUID(List<U> strings, Handler<AsyncResult<List<U>>> completer) {
+    private <U> void newUUIDFromOldUUID(List<U> strings, Handler<AsyncResult<List<U>>> resultHandler) {
         List<Future> futureList = new ArrayList<>();
         strings.forEach(s -> {
             Future<U> item = Future.future();
@@ -95,7 +95,7 @@ public class JavaVerticle extends AbstractVerticle {
         });
 
         CompositeFuture.all(futureList).setHandler(allRes ->
-                completer.handle(Future.succeededFuture(futureList.stream()
+                resultHandler.handle(Future.succeededFuture(futureList.stream()
                         .map(Future::result)
                         .map(o -> (U) o)
                         .collect(toList()))));
