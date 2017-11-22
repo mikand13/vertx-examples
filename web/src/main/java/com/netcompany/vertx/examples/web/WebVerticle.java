@@ -34,8 +34,9 @@ public class WebVerticle extends AbstractVerticle {
         router.get("/first").handler(new EndHandler());
 
         Router anythingRouter = Router.router(vertx);
-        router.mountSubRouter("/anything", anythingRouter);
         anythingRouter.get("/after/this*").handler(new StarHandler());
         anythingRouter.get("/after/this*").handler(new EndHandler());
+
+        router.mountSubRouter("/anything", anythingRouter);
     }
 }

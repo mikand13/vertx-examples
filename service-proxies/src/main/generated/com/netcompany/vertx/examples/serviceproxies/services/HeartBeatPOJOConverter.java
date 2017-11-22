@@ -17,6 +17,7 @@
 package com.netcompany.vertx.examples.serviceproxies.services;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
 
 /**
  * Converter for {@link com.netcompany.vertx.examples.serviceproxies.services.HeartBeatPOJO}.
