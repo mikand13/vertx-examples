@@ -1,7 +1,7 @@
 # vertx-examples
 Vertx Examples of Basic Concepts 
 
-Presentation: []
+Presentation: [https://docs.google.com/presentation/d/1sX5nZ65EgZuaWkNwj1y0E-pXKWdmzJJoUuFtcDbEI-c/edit?usp=sharing]
 
 ## base
 
