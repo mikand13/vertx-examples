@@ -3,6 +3,13 @@ Vertx Examples of Basic Concepts
 
 Presentation: [https://docs.google.com/presentation/d/1sX5nZ65EgZuaWkNwj1y0E-pXKWdmzJJoUuFtcDbEI-c/edit?usp=sharing]
 
+## Required Dependencies for all Examples (Varies from example to example)
+
+- Docker
+- Docker-Compose
+- Java
+- Node
+
 ## base
 
 This example shows how we can run multiple verticles from different languages side by side, effortlessly.
