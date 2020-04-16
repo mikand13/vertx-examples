@@ -12,82 +12,68 @@ import io.vertx.core.logging.LoggerFactory
 class KotlinConsumer : AbstractVerticle() {
     private val logger: Logger = LoggerFactory.getLogger(javaClass.simpleName)
 
-    private var publishConsumer: MessageConsumer<JsonObject>? = null
-    private var sendConsumer: MessageConsumer<JsonObject>? = null
+    private lateinit var publishConsumer: MessageConsumer<JsonObject>
+    private lateinit var sendConsumer: MessageConsumer<JsonObject>
 
-    override fun start(startFuture: Future<Void>?) {
+    override fun start(startFuture: Future<Void>) {
         setConsumers(startFuture)
     }
 
-    private fun setConsumers(startFuture: Future<Void>?) {
-        publishConsumer = vertx.eventBus().consumer<JsonObject>(EventBusVerticle.EXAMPLE_PUBLISH_ADDRESS, { message ->
-            logger.info("Received publish message: " + message.body().encode())
-        })
-
-        val publishFuture: Future<Void> = Future.future()
-
-        if (publishConsumer == null) {
-            publishFuture.fail("Publish Consumer is null!")
-        } else {
-            publishConsumer?.completionHandler(publishFuture.completer())
-        }
-
-        sendConsumer = vertx.eventBus().consumer<JsonObject>(EventBusVerticle.EXAMPLE_SEND_ADDRESS, { message ->
-            logger.info("Received send message from: " + message.replyAddress() +
-                    " with " + message.body().encode())
-
-            message.reply(JsonObject().put("replier", "Kotlin"))
-        })
-
-        val sendFuture: Future<Void> = Future.future()
-
-        if (sendConsumer == null) {
-            sendFuture.fail("Send Consumer is null!")
-        } else {
-            sendConsumer?.completionHandler(sendFuture.completer())
-        }
-
-        CompositeFuture.any(listOf(publishFuture, sendFuture)).setHandler({ res ->
-            if (res.failed()) {
-                logger.error("Unable to publish consumers!", res.cause())
-
-                startFuture?.fail(res.cause())
-            } else {
-                startFuture?.complete()
-            }
-        })
-    }
-
-    override fun stop(stopFuture: Future<Void>?) {
+    override fun stop(stopFuture: Future<Void>) {
         stopConsumers(stopFuture)
     }
 
-    private fun stopConsumers(stopFuture: Future<Void>?) {
+    private fun setConsumers(startFuture: Future<Void>) {
         val publishFuture: Future<Void> = Future.future()
         val sendFuture: Future<Void> = Future.future()
 
-        if (publishConsumer == null) {
-            publishFuture.fail("Publish Consumer is null!")
-        } else {
-            publishConsumer?.unregister(publishFuture.completer())
+        publishConsumer = vertx.eventBus().consumer(EventBusVerticle.EXAMPLE_PUBLISH_ADDRESS) {
+            logger.info("Received publish message: " + it.body().encode())
+        }
+        sendConsumer = vertx.eventBus().consumer(EventBusVerticle.EXAMPLE_SEND_ADDRESS) {
+            logger.info(
+                "Received send message from: " + it.replyAddress() +
+                " with " + it.body().encode()
+            )
+
+            it.reply(JsonObject().put("replier", "Kotlin"))
         }
 
-        if (sendConsumer == null) {
-            sendFuture.fail("Send Consumer is null!")
-        } else {
-            sendConsumer?.unregister(sendFuture.completer())
-        }
+        publishConsumer.completionHandler(publishFuture)
+        sendConsumer.completionHandler(sendFuture)
 
-        CompositeFuture.all(listOf(publishFuture, sendFuture)).setHandler({ unregister ->
-            if (unregister.failed()) {
-                logger.error("Failed deregister!", unregister.cause())
+        CompositeFuture.any(listOf(publishFuture, sendFuture)).setHandler {
+            when {
+                it.failed() -> {
+                    logger.error("Unable to publish consumers!", it.cause())
 
-                stopFuture?.fail(unregister.cause())
-            } else {
-                logger.info("All Consumers unregistered!")
-
-                stopFuture?.complete()
+                    startFuture.fail(it.cause())
+                }
+                else -> startFuture.complete()
             }
-        })
+        }
+    }
+
+    private fun stopConsumers(stopFuture: Future<Void>) {
+        val publishFuture: Future<Void> = Future.future()
+        val sendFuture: Future<Void> = Future.future()
+
+        publishConsumer.unregister(publishFuture)
+        sendConsumer.unregister(sendFuture)
+
+        CompositeFuture.all(listOf(publishFuture, sendFuture)).setHandler {
+            when {
+                it.failed() -> {
+                    logger.error("Failed deregister!", it.cause())
+
+                    stopFuture.fail(it.cause())
+                }
+                else -> {
+                    logger.info("All Consumers unregistered!")
+
+                    stopFuture.complete()
+                }
+            }
+        }
     }
 }

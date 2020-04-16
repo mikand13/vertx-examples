@@ -4,7 +4,5 @@ import io.vertx.core.Handler
 import io.vertx.ext.web.RoutingContext
 
 class EndHandler : Handler<RoutingContext> {
-    override fun handle(event: RoutingContext?) {
-        event?.response()?.setStatusCode(200)?.end()
-    }
+    override fun handle(event: RoutingContext) = event.response().setStatusCode(200).end()
 }

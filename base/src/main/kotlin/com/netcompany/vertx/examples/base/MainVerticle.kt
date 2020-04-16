@@ -17,18 +17,19 @@ class MainVerticle : AbstractVerticle () {
         val jsFuture: Future<String> = Future.future()
         val rubyFuture: Future<String> = Future.future()
 
-        vertx.deployVerticle(JavaVerticle(), DeploymentOptions().setConfig(config()), javaFuture.completer())
-        vertx.deployVerticle("js/javaScriptVerticle.js", DeploymentOptions().setConfig(config()), jsFuture.completer())
-        vertx.deployVerticle("ruby/ruby_verticle.rb", DeploymentOptions().setConfig(config()), rubyFuture.completer())
+        vertx.deployVerticle(JavaVerticle(), DeploymentOptions().setConfig(config()), javaFuture)
+        vertx.deployVerticle("js/javaScriptVerticle.js", DeploymentOptions().setConfig(config()), jsFuture)
+        vertx.deployVerticle("ruby/ruby_verticle.rb", DeploymentOptions().setConfig(config()), rubyFuture)
 
-        CompositeFuture.all(javaFuture, jsFuture, rubyFuture).setHandler({ res ->
-            if (res.failed()) {
-                startFuture.fail(res.cause())
-            } else {
-                startFuture.complete()
+        CompositeFuture.all(javaFuture, jsFuture, rubyFuture).setHandler {
+            when {
+                it.failed() -> startFuture.fail(it.cause())
+                else -> {
+                    startFuture.complete()
 
-                logger.info("All verticles running, deployment complete!")
+                    logger.info("All verticles running, deployment complete!")
+                }
             }
-        })
+        }
     }
 }

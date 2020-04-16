@@ -46,8 +46,7 @@ public class JavaVerticle extends AbstractVerticle {
     private void doFutureExamples(Future<Void> startFuture) {
         getListOfRandomStrings(20)
                 .compose(this::parseAllStrings)
-                .compose(list -> printListAndStart(list, startFuture.completer()),
-                        startFuture);
+                .compose(list -> printListAndStart(list, startFuture), startFuture);
     }
 
     private void printListAndStart(List<String> strings, Handler<AsyncResult<Void>> resultHandler) {
@@ -62,7 +61,7 @@ public class JavaVerticle extends AbstractVerticle {
     private Future<List<String>> getListOfRandomStrings(int size) {
         Future<List<String>> listFuture = Future.future();
 
-        createRandomList(size, listFuture.completer());
+        createRandomList(size, listFuture);
 
         return listFuture;
     }
@@ -78,7 +77,7 @@ public class JavaVerticle extends AbstractVerticle {
     private <U> Future<List<U>> parseAllStrings(List<U> strings) {
         Future<List<U>> listFuture = Future.future();
 
-        newUUIDFromOldUUID(strings, listFuture.completer());
+        newUUIDFromOldUUID(strings, listFuture);
 
         return listFuture;
     }
@@ -89,7 +88,7 @@ public class JavaVerticle extends AbstractVerticle {
         strings.forEach(s -> {
             Future<U> item = Future.future();
 
-            processObject(s, item.completer());
+            processObject(s, item);
 
             futureList.add(item);
         });

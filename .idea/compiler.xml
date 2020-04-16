@@ -10,6 +10,21 @@
       <module name="eventbus_test" target="1.8" />
       <module name="examples-cluster_main" target="1.8" />
       <module name="examples-cluster_test" target="1.8" />
+      <module name="examples.base" target="1.8" />
+      <module name="examples.base.main" target="1.8" />
+      <module name="examples.base.test" target="1.8" />
+      <module name="examples.cluster" target="1.8" />
+      <module name="examples.cluster.main" target="1.8" />
+      <module name="examples.cluster.test" target="1.8" />
+      <module name="examples.eventbus" target="1.8" />
+      <module name="examples.eventbus.main" target="1.8" />
+      <module name="examples.eventbus.test" target="1.8" />
+      <module name="examples.service-proxies" target="1.8" />
+      <module name="examples.service-proxies.main" target="1.8" />
+      <module name="examples.service-proxies.test" target="1.8" />
+      <module name="examples.web" target="1.8" />
+      <module name="examples.web.main" target="1.8" />
+      <module name="examples.web.test" target="1.8" />
       <module name="service-proxies_generated" target="1.8" />
       <module name="service-proxies_main" target="1.8" />
       <module name="service-proxies_test" target="1.8" />

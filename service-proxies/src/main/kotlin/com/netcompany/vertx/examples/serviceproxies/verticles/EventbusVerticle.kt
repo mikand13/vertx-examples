@@ -27,43 +27,48 @@ class EventbusVerticle : AbstractVerticle() {
     private var registerService: MessageConsumer<JsonObject>? = null
     private var ebHandler: SockJSHandler? = null
 
-    override fun start(startFuture: Future<Void>?) {
-        val router: Router = Router.router(vertx)
-        router.get("/").handler({ context ->
+    override fun start(startFuture: Future<Void>) {
+        val router = Router.router(vertx)
+        router.get("/").handler { context ->
             context.response()
-                    .putHeader("content-type", "text/plain")
-                    .end("Hello from Java Vert.x!")
-        })
+                .putHeader("content-type", "text/plain")
+                .end("Hello from Java Vert.x!")
+        }
 
-        val ports = config().getJsonObject("ports")
-        val javaPort = if (ports?.getInteger("java") != null) ports.getInteger("java") else 8080
+        val javaPort = config().getJsonObject("ports")?.getInteger("java") ?: 8080
 
-        vertx.createHttpServer().requestHandler(router::accept).listen(javaPort!!) { listenRes ->
-            if (listenRes.failed()) {
-                startFuture?.fail(listenRes.cause())
-            } else {
-                deployHeartBeatService()
+        vertx.createHttpServer().requestHandler(router::accept).listen(javaPort) {
+            when {
+                it.failed() -> startFuture.fail(it.cause())
+                else -> {
+                    deployHeartBeatService()
 
-                deployBridge(router)
+                    deployBridge(router)
 
-                startFuture?.complete()
+                    startFuture.complete()
+                }
             }
         }
     }
 
     private fun deployHeartBeatService() {
-        registerService = ProxyHelper.registerService(HeartBeatService::class.java, vertx, heartBeat, "com.netcompany.heart")
+        registerService = ProxyHelper.registerService(
+            HeartBeatService::class.java,
+            vertx,
+            heartBeat,
+            "com.netcompany.heart"
+        )
 
         logger.info("Deployed HeartBeatService")
     }
 
     private fun deployBridge(router: Router) {
         val options = SockJSHandlerOptions()
-                .setHeartbeatInterval(150000L)
-                .setInsertJSESSIONID(false)
+            .setHeartbeatInterval(150000L)
+            .setInsertJSESSIONID(false)
 
         ebHandler = SockJSHandler.create(vertx, options)
-        ebHandler?.bridge(createBridgeOptions(), { bridgeEvent ->
+        ebHandler?.bridge(createBridgeOptions()) { bridgeEvent ->
             logger.debug("Event received from external client!")
 
             if (bridgeEvent.type() != null) {
@@ -131,7 +136,7 @@ class EventbusVerticle : AbstractVerticle() {
             } else {
                 logger.error("Type is null!, Message is: " + Json.encodePrettily(bridgeEvent))
             }
-        })
+        }
 
         router.route("/eventbus/*").handler(CookieHandler.create())
         router.route("/eventbus/*").handler(ebHandler)

@@ -22,8 +22,8 @@ public class EventBusVerticle extends AbstractVerticle {
         Integer javaPort = ports != null && ports.getInteger("java") != null ? ports.getInteger("java") : 8080;
 
         vertx.createHttpServer().requestHandler(req -> req.response()
-                .putHeader("content-type", "text/plain")
-                .end("Hello from Java Vert.x!")
+            .putHeader("content-type", "text/plain")
+            .end("Hello from Java Vert.x!")
         ).listen(javaPort, listenRes -> {
             if (listenRes.failed()) {
                 startFuture.fail(listenRes.cause());
@@ -38,8 +38,8 @@ public class EventBusVerticle extends AbstractVerticle {
     private void setPeriodicPublisher() {
         try {
             JsonObject data = new JsonObject()
-                    .put("testKey", "testValue")
-                    .put("host", InetAddress.getLocalHost().getHostName());
+                .put("testKey", "testValue")
+                .put("host", InetAddress.getLocalHost().getHostName());
 
             vertx.setPeriodic(10000L, aLong -> {
                 logger.info("Sending publish with: " + data.encode());
@@ -53,8 +53,10 @@ public class EventBusVerticle extends AbstractVerticle {
                 } else {
                     final Message<JsonObject> message = reply.result();
 
-                    logger.info("Received reply from: " + message.body().getString("replier") +
-                            " at " + message.address() + " with " + message.body().encode());
+                    logger.info(
+                        "Received reply from: " + message.body().getString("replier") +
+                        " at " + message.address() + " with " + message.body().encode()
+                    );
                 }
             }));
         } catch (UnknownHostException e) {

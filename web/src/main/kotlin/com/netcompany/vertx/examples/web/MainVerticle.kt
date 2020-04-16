@@ -13,16 +13,17 @@ class MainVerticle : AbstractVerticle () {
         logger.debug("Config is: " + config().encodePrettily())
 
         val javaFuture: Future<String> = Future.future()
-        javaFuture.setHandler({ res ->
-            if (res.failed()) {
-                startFuture.fail(res.cause())
-            } else {
-                startFuture.complete()
+        javaFuture.setHandler { res ->
+            when {
+                res.failed() -> startFuture.fail(res.cause())
+                else -> {
+                    startFuture.complete()
 
-                logger.info("All verticles running, deployment complete!")
+                    logger.info("All verticles running, deployment complete!")
+                }
             }
-        })
+        }
 
-        vertx.deployVerticle(WebVerticle(), DeploymentOptions().setConfig(config()), javaFuture.completer())
+        vertx.deployVerticle(WebVerticle(), DeploymentOptions().setConfig(config()), javaFuture)
     }
 }

@@ -20,9 +20,10 @@ import org.junit.runner.RunWith
 @RunWith(VertxUnitRunner::class)
 class MainVerticleTest : WhenSupport, ConfigSupport {
     private var logger: Logger = LoggerFactory.getLogger(MainVerticleTest::class.simpleName)
-    private var vertx: Vertx? = null
+    private lateinit var vertx: Vertx
 
     companion object {
+        @Suppress("unused")
         @BeforeClass
         fun beforeClass() {
             RestAssured.port = 8080
@@ -37,18 +38,18 @@ class MainVerticleTest : WhenSupport, ConfigSupport {
         val config = getTestConfig()
 
         vertx = Vertx.vertx()
-        vertx?.deployVerticle(MainVerticle(), DeploymentOptions().setConfig(config), { deployRes ->
-            if (deployRes.failed()) {
-                logger.error("Could not deploy application!", deployRes.cause())
+        vertx.deployVerticle(MainVerticle(), DeploymentOptions().setConfig(config)) {
+            if (it.failed()) {
+                logger.error("Could not deploy application!", it.cause())
             }
 
             async.complete()
-        })
+        }
     }
 
     @After
     fun tearDown() {
-        vertx?.close()
+        vertx.close()
     }
 
     @Test

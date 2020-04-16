@@ -14,30 +14,30 @@ class MainVerticle : AbstractVerticle () {
     override fun start(startFuture: Future<Void>) {
         logger.debug("Config is: " + config().encodePrettily())
 
-        vertx.deployVerticle(EventbusVerticle(), { eventBusRes ->
-            if (eventBusRes.failed()) {
-                startFuture.fail(eventBusRes.cause())
-            } else {
-                startRubyAndJs(startFuture)
+        vertx.deployVerticle(EventbusVerticle()) {
+            when {
+                it.failed() -> startFuture.fail(it.cause())
+                else -> startRubyAndJs(startFuture)
             }
-        })
+        }
     }
 
     private fun startRubyAndJs(startFuture: Future<Void>) {
         val rubyFuture : Future<String> = Future.future()
         val jsFuture : Future<String> = Future.future()
 
-        vertx.deployVerticle("js/javaScriptConsumerVerticle.js", DeploymentOptions().setConfig(config()), jsFuture.completer())
-        vertx.deployVerticle("ruby/ruby_consumer_verticle.rb", DeploymentOptions().setConfig(config()), rubyFuture.completer())
+        vertx.deployVerticle("js/javaScriptConsumerVerticle.js", DeploymentOptions().setConfig(config()), jsFuture)
+        vertx.deployVerticle("ruby/ruby_consumer_verticle.rb", DeploymentOptions().setConfig(config()), rubyFuture)
 
-        CompositeFuture.all(rubyFuture, jsFuture).setHandler({ depRes ->
-            if (depRes.failed()) {
-                startFuture.fail(depRes.cause())
-            } else {
-                logger.info("All verticles running, deployment complete!")
+        CompositeFuture.all(rubyFuture, jsFuture).setHandler {
+            when {
+                it.failed() -> startFuture.fail(it.cause())
+                else -> {
+                    logger.info("All verticles running, deployment complete!")
 
-                startFuture.complete()
+                    startFuture.complete()
+                }
             }
-        })
+        }
     }
 }
